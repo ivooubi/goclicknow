@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0c10">
+<title>Ascenso</title>
+<style>
+:root{
+  --h:210;
+  --bg:#0b0c10;
+  --panel:#12141a;
+  --panel2:#171a22;
+  --line:rgba(255,255,255,.07);
+  --text:#eceef3;
+  --muted:#8b91a1;
+  --accent:hsl(var(--h) 90% 62%);
+  --accent-soft:hsl(var(--h) 90% 62% / .14);
+  --gold:#f5c451;
+  --dia:#7fe7ff;
+  --radius:16px;
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(900px 500px at 25% -10%, hsl(var(--h) 80% 50% / .10), transparent 70%);
+  transition:background-image .8s;
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.top{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:max(14px,env(safe-area-inset-top)) 22px 14px;
+  border-bottom:1px solid var(--line);
+}
+.brand{font-weight:650;letter-spacing:.22em;font-size:13px;text-transform:uppercase}
+.world{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.world b{
+  background:var(--accent-soft);color:var(--accent);
+  padding:3px 9px;border-radius:99px;font-weight:600;font-size:12px;
+}
+.ghost{
+  color:var(--muted);font-size:13px;padding:7px 12px;border-radius:10px;
+  border:1px solid var(--line);transition:.2s var(--ease);
+}
+.ghost:hover{color:var(--text);background:var(--panel2)}
+
+main{
+  display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:0;
+  height:calc(100% - 58px);
+}
+.stage{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:26px;padding:24px;min-width:0;
+}
+.count{text-align:center}
+#count{
+  font-size:clamp(44px,7vw,76px);font-weight:700;letter-spacing:-.03em;
+  font-variant-numeric:tabular-nums;line-height:1;
+}
+.sub{color:var(--muted);font-size:14px;margin-top:8px}
+.sub span{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
+
+.btnwrap{position:relative;width:min(240px,56vw);aspect-ratio:1}
+#big{
+  position:relative;width:100%;height:100%;border-radius:50%;
+  background:
+    radial-gradient(circle at 35% 28%, hsl(var(--h) 90% 75% / .95), hsl(var(--h) 85% 52%) 55%, hsl(var(--h) 80% 38%));
+  box-shadow:
+    0 0 0 10px hsl(var(--h) 90% 62% / .08),
+    0 0 0 22px hsl(var(--h) 90% 62% / .04),
+    0 24px 60px hsl(var(--h) 90% 50% / .28),
+    inset 0 -10px 24px rgba(0,0,0,.25),
+    inset 0 6px 14px rgba(255,255,255,.25);
+  transition:transform .18s var(--ease), box-shadow .6s, background .6s;
+  animation:breathe 4s ease-in-out infinite;
+  user-select:none;touch-action:manipulation;
+}
+#big:hover{transform:scale(1.025)}
+#big:active{transform:scale(.955)}
+#big:focus-visible{outline:2px solid #fff;outline-offset:6px}
+.core{
+  position:absolute;inset:36%;border-radius:50%;
+  background:rgba(255,255,255,.18);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.35);
+  pointer-events:none;
+}
+@keyframes breathe{50%{box-shadow:
+    0 0 0 14px hsl(var(--h) 90% 62% / .08),
+    0 0 0 30px hsl(var(--h) 90% 62% / .03),
+    0 24px 70px hsl(var(--h) 90% 50% / .34),
+    inset 0 -10px 24px rgba(0,0,0,.25),
+    inset 0 6px 14px rgba(255,255,255,.25);}}
+
+#floats{position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:5}
+.f{
+  position:absolute;font-weight:650;font-size:20px;white-space:nowrap;
+  transform:translate(-50%,-50%);
+  animation:floatUp .95s var(--ease) forwards;
+  text-shadow:0 2px 12px rgba(0,0,0,.5);
+}
+.f.gold{color:var(--gold);font-size:26px}
+.f.dia{color:var(--dia);font-size:30px}
+@keyframes floatUp{
+  0%{opacity:0;transform:translate(-50%,-30%) scale(.8)}
+  15%{opacity:1}
+  100%{opacity:0;transform:translate(-50%,-190%) scale(1.05)}
+}
+
+.stats{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.chip{
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:9px 14px;min-width:92px;text-align:center;
+}
+.chip small{display:block;color:var(--muted);font-size:11px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:3px}
+.chip b{font-size:15px;font-variant-numeric:tabular-nums}
+.chip.g b{color:var(--gold)} .chip.d b{color:var(--dia)}
+
+.progress{width:min(440px,100%)}
+.bar{height:8px;border-radius:99px;background:var(--panel2);overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:inherit;background:var(--accent);transition:width .25s linear, background .6s}
+.plabel{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:13px;color:var(--muted);gap:10px;min-height:34px}
+#rebirth{
+  background:var(--accent);color:#06101a;font-weight:650;font-size:13px;
+  padding:8px 14px;border-radius:10px;
+  animation:pulse 1.8s ease-in-out infinite;
+}
+#rebirth[hidden]{display:none}
+@keyframes pulse{50%{box-shadow:0 0 0 8px hsl(var(--h) 90% 62% / .18)}}
+
+/* tienda */
+.shop{
+  background:var(--panel);border-left:1px solid var(--line);
+  display:flex;flex-direction:column;min-height:0;
+}
+.shophead{padding:14px 14px 10px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.tabs,.modes{display:flex;gap:4px;background:var(--bg);padding:4px;border-radius:11px}
+.tabs button,.modes button{
+  flex:1;padding:7px 4px;font-size:12.5px;color:var(--muted);border-radius:8px;transition:.2s var(--ease);
+}
+.tabs button.on,.modes button.on{background:var(--panel2);color:var(--text)}
+#list{overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;flex:1;min-height:0}
+.up{
+  display:grid;grid-template-columns:1fr auto;gap:2px 12px;text-align:left;
+  padding:12px 14px;border-radius:14px;background:var(--panel2);
+  border:1px solid transparent;transition:transform .15s var(--ease), border-color .2s, opacity .2s;
+  animation:in .35s var(--ease);
+}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}
+.up .n{font-weight:600;font-size:14px}
+.up .lv{font-size:12px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.up .d{font-size:12.5px;color:var(--muted)}
+.up .c{font-size:13px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.up.ok{border-color:hsl(var(--h) 90% 62% / .35)}
+.up.ok .c{color:var(--accent)}
+.up.ok:hover{transform:translateY(-1px)}
+.up.ok:active{transform:scale(.985)}
+.up:not(.ok){opacity:.55;cursor:default}
+.up.maxed{opacity:.5;cursor:default}
+.up.gold .n{color:var(--gold)} .up.dia .n{color:var(--dia)}
+.up.bump{animation:bump .3s var(--ease)}
+@keyframes bump{40%{transform:scale(.97)}}
+.hide{display:none!important}
+
+#toast{
+  position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);
+  background:var(--panel2);border:1px solid var(--line);padding:11px 18px;border-radius:12px;
+  font-size:13.5px;opacity:0;pointer-events:none;transition:.35s var(--ease);z-index:50;max-width:90vw;text-align:center;
+}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+dialog{
+  margin:auto;background:var(--panel);color:var(--text);border:1px solid var(--line);
+  border-radius:20px;padding:26px;width:min(380px,90vw);
+}
+dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
+dialog[open]{animation:in .3s var(--ease)}
+dialog h2{font-size:18px;margin-bottom:8px}
+dialog p{color:var(--muted);font-size:14px;line-height:1.5;margin-bottom:20px}
+dialog .row{display:flex;gap:10px;justify-content:flex-end}
+dialog .row button{padding:9px 16px;border-radius:10px;font-size:14px;border:1px solid var(--line)}
+dialog .row .pri{background:var(--accent);color:#06101a;font-weight:650;border-color:transparent}
+dialog .row .dan{background:#e5484d;color:#fff;font-weight:650;border-color:transparent}
+
+@media (max-width:860px){
+  html,body{height:auto}
+  main{grid-template-columns:1fr;height:auto}
+  .stage{padding:28px 16px}
+  .shop{border-left:0;border-top:1px solid var(--line)}
+  #list{max-height:none;overflow:visible}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">Ascenso</div>
+  <div class="world"><span id="worldName"></span><b id="worldMult"></b></div>
+  <button class="ghost" id="menuBtn">Ajustes</button>
+</header>
+
+<main>
+  <section class="stage">
+    <div class="count">
+      <div id="count">0</div>
+      <div class="sub"><span id="cps">0</span> clics por segundo</div>
+    </div>
+
+    <div class="btnwrap">
+      <button id="big" aria-label="Hacer clic"><span class="core"></span></button>
+      <div id="floats"></div>
+    </div>
+
+    <div class="stats">
+      <div class="chip"><small>Por clic</small><b id="sClick">1</b></div>
+      <div class="chip g"><small>Dorado · 5%</small><b id="sGold">0%</b></div>
+      <div class="chip d"><small>Diamante · 15%</small><b id="sDia">0%</b></div>
+      <div class="chip"><small>Bonus</small><b id="sMult">x1</b></div>
+    </div>
+
+    <div class="progress">
+      <div class="bar"><i id="barFill"></i></div>
+      <div class="plabel"><span id="plabel"></span><button id="rebirth" hidden></button></div>
+    </div>
+  </section>
+
+  <aside class="shop">
+    <div class="shophead">
+      <div class="tabs" id="tabs">
+        <button data-cat="click" class="on">Clic</button>
+        <button data-cat="cps">Automático</button>
+        <button data-cat="luck">Suerte</button>
+        <button data-cat="mult">Global</button>
+      </div>
+      <div class="modes" id="modes">
+        <button data-m="1" class="on">x1</button>
+        <button data-m="10">x10</button>
+        <button data-m="max">Máx</button>
+      </div>
+    </div>
+    <div id="list"></div>
+  </aside>
+</main>
+
+<div id="toast"></div>
+<dialog id="dlg">
+  <h2 id="dTitle"></h2>
+  <p id="dText"></p>
+  <div class="row"><button id="dNo">Cancelar</button><button id="dYes" class="pri">Aceptar</button></div>
+</dialog>
+
+<script>
+/* ============ CONFIGURACIÓN (todo el equilibrio del juego está aquí) ============ */
+const SAVE_KEY = 'ascenso_save_v1';
+const WORLD_NAMES = ['Origen','Éter','Aurora','Nébula','Cosmos','Infinito'];
+const WORLD_HUES  = [210, 265, 160, 330, 35, 190];
+// Clics acumulados en el mundo necesarios para poder renacer (el último es la meta final)
+const GOALS = [2.5e5, 5e6, 1e8, 2e9, 5e10, 1e12];
+const GOLD_PCT = 0.05, DIA_PCT = 0.15;
+const GOLD_CAP = 0.5, DIA_CAP = 0.25;
+const OFFLINE_RATE = 0.5, OFFLINE_MAX_H = 8;
+
+/* cat: click | cps | luck | mult · g = crecimiento del coste por nivel · max = niveles máximos */
+const U = [];
+const add = (o)=>U.push(Object.assign({g:1.15,max:Infinity},o));
+
+[['Dedo ágil',15,1],['Guante de precisión',120,4],['Ratón gamer',900,20],['Macro básica',7e3,100],
+ ['Turbo clic',5.5e4,500],['Pulso cuántico',4.5e5,2.5e3],['Onda de choque',4e6,1.5e4],['Singularidad',3.5e7,9e4]]
+ .forEach(([name,base,v])=>add({id:'c_'+name,cat:'click',name,base,v,type:'click'}));
+
+[['Cursor automático',20,.2],['Aprendiz',110,1],['Taller',900,6],['Fábrica',7.5e3,35],['Laboratorio',6.5e4,200],
+ ['Reactor',5.5e5,1200],['Portal',5e6,7000],['Núcleo estelar',4.5e7,4.5e4],['Máquina del tiempo',4e8,3e5],['Universo propio',3.5e9,2e6]]
+ .forEach(([name,base,v])=>add({id:'a_'+name,cat:'cps',name,base,v,type:'cps'}));
+
+[['Toque de oro',150],['Brillo dorado',2e3],['Fortuna',2.5e4],['Racha dorada',3e5],['Marea de oro',4e6],['Midas',6e7]]
+ .forEach(([name,base])=>add({id:'g_'+name,cat:'luck',name,base,v:.005,type:'gold',g:1.8,max:5,tone:'gold'}));
+
+[['Chispa de cristal',1e3],['Prisma',1.2e4],['Facetado',1.5e5],['Corte perfecto',2e6],['Pureza',3e7],['Corazón de diamante',5e8]]
+ .forEach(([name,base])=>add({id:'d_'+name,cat:'luck',name,base,v:.003,type:'dia',g:1.8,max:5,tone:'dia'}));
+
+[['Sinergia I',5e3],['Sinergia II',1e5],['Sinergia III',2e6],['Sinergia IV',4e7]]
+ .forEach(([name,base])=>add({id:'m_'+name,cat:'mult',name,base,v:.10,type:'mult',g:2.5,max:10}));
+
+/* ============ UTILIDADES ============ */
+const SUF=['','K','M','B','T','Qa','Qi','Sx','Sp','Oc','No','Dc'];
+function fmt(n){
+  if(!isFinite(n)) return '∞';
+  if(n<1000) return (n<10 && n%1) ? n.toFixed(1) : String(Math.floor(n));
+  const i=Math.floor(Math.log10(n)/3);
+  if(i>=SUF.length) return n.toExponential(2);
+  const v=n/10**(i*3);
+  return v.toFixed(v<10?2:v<100?1:0)+SUF[i];
+}
+const $=id=>document.getElementById(id);
+const pct=x=>(x*100).toFixed(x*100%1?1:0)+'%';
+
+/* ============ ESTADO ============ */
+const fresh=()=>({world:0,clicks:0,earned:0,lifetime:0,taps:0,levels:{},won:false,last:Date.now()});
+let S=fresh();
+try{ const raw=localStorage.getItem(SAVE_KEY); if(raw) S=Object.assign(fresh(),JSON.parse(raw)); }catch(e){}
+let tab='click', mode='1';
+
+function derived(){
+  let click=1,cps=0,gold=0,dia=0,mult=0;
+  for(const u of U){
+    const l=S.levels[u.id]||0; if(!l) continue;
+    if(u.type==='click') click+=u.v*l;
+    else if(u.type==='cps') cps+=u.v*l;
+    else if(u.type==='gold') gold+=u.v*l;
+    else if(u.type==='dia') dia+=u.v*l;
+    else if(u.type==='mult') mult+=u.v*l;
+  }
+  const m=(2**S.world)*(1+mult);
+  return {click:click*m,cps:cps*m,gold:Math.min(gold,GOLD_CAP),dia:Math.min(dia,DIA_CAP),m};
+}
+const goal=()=>GOALS[S.world];
+
+/* ============ TIENDA ============ */
+const rows={};
+function buildList(){
+  const list=$('list'); list.innerHTML='';
+  for(const u of U){
+    const b=document.createElement('button');
+    b.className='up'+(u.tone?' '+u.tone:'');
+    b.innerHTML='<span class="n"></span><span class="lv"></span><span class="d"></span><span class="c"></span>';
+    b.children[0].textContent=u.name;
+    b.children[2].textContent=
+      u.type==='click'?`+${fmt(u.v)} por clic`:
+      u.type==='cps'?`+${fmt(u.v)} clics por segundo`:
+      u.type==='gold'?`+${pct(u.v)} prob. golpe dorado`:
+      u.type==='dia'?`+${pct(u.v)} prob. golpe de diamante`:
+      `+${pct(u.v)} a todo`;
+    b.addEventListener('click',()=>buy(u,b));
+    list.appendChild(b); rows[u.id]=b;
+  }
+}
+function plan(u,lvl){
+  const room=u.max-lvl; if(room<=0) return {n:0,cost:0};
+  let n;
+  if(mode==='max'){
+    n=0;let c=0;
+    while(n<room && n<500){const nx=u.base*u.g**(lvl+n); if(c+nx>S.clicks)break; c+=nx;n++;}
+    if(n===0)n=1;
+  } else n=Math.min(+mode,room);
+  const cost=u.base*u.g**lvl*(u.g**n-1)/(u.g-1);
+  return {n,cost};
+}
+function buy(u,el){
+  const lvl=S.levels[u.id]||0, p=plan(u,lvl);
+  if(!p.n||S.clicks<p.cost) return;
+  S.clicks-=p.cost; S.levels[u.id]=lvl+p.n;
+  el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
+  render();
+}
+
+/* ============ RENDER ============ */
+function render(){
+  const D=derived(), g=goal();
+  $('count').textContent=fmt(Math.floor(S.clicks));
+  $('cps').textContent=fmt(D.cps);
+  $('sClick').textContent=fmt(D.click);
+  $('sGold').textContent=pct(D.gold);
+  $('sDia').textContent=pct(D.dia);
+  $('sMult').textContent='x'+(Math.round(D.m*100)/100);
+  $('worldName').textContent=`Mundo ${S.world+1} · ${WORLD_NAMES[S.world]}`;
+  $('worldMult').textContent='x'+2**S.world;
+  document.documentElement.style.setProperty('--h',WORLD_HUES[S.world]);
+
+  const ratio=Math.min(1,S.earned/g);
+  $('barFill').style.width=(ratio*100)+'%';
+  const last=S.world===GOALS.length-1;
+  const reached=S.earned>=g;
+  $('plabel').textContent=reached
+    ? (last?'¡Meta final alcanzada! Has completado Ascenso.':'¡Meta del mundo alcanzada!')
+    : `${fmt(Math.floor(S.earned))} / ${fmt(g)} para ${last?'completar el juego':'el siguiente mundo'}`;
+  const rb=$('rebirth');
+  if(reached && !last){ rb.hidden=false; rb.textContent=`Renacer · Mundo ${S.world+2}`; }
+  else rb.hidden=true;
+  if(reached && last && !S.won){ S.won=true; toast('Has completado todos los mundos. Puedes seguir jugando.'); save(); }
+
+  for(const u of U){
+    const el=rows[u.id], lvl=S.levels[u.id]||0;
+    const visible=u.cat===tab && (lvl>0 || S.earned>=u.base*.5);
+    el.classList.toggle('hide',!visible);
+    if(!visible) continue;
+    const p=plan(u,lvl), maxed=p.n===0;
+    el.children[1].textContent=u.max<Infinity?`Nv ${lvl}/${u.max}`:`Nv ${lvl}`;
+    el.children[3].textContent=maxed?'Máximo':(p.n>1?`x${p.n} · `:'')+fmt(p.cost);
+    el.classList.toggle('maxed',maxed);
+    el.classList.toggle('ok',!maxed && S.clicks>=p.cost);
+  }
+  // pestañas vacías
+  const empty=!U.some(u=>u.cat===tab&&((S.levels[u.id]||0)>0||S.earned>=u.base*.5));
+  let hint=$('hint');
+  if(empty){
+    if(!hint){hint=document.createElement('div');hint.id='hint';hint.className='d';
+      hint.style.cssText='color:var(--muted);font-size:13px;text-align:center;padding:24px 10px';
+      hint.textContent='Sigue jugando para desbloquear mejoras aquí.';$('list').appendChild(hint);}
+  } else if(hint) hint.remove();
+}
+
+/* ============ CLIC ============ */
+const big=$('big'), floats=$('floats');
+function floatText(txt,cls,x,y){
+  if(floats.children.length>40) floats.firstChild.remove();
+  const f=document.createElement('div');
+  f.className='f '+cls; f.textContent=txt;
+  f.style.left=x+'px'; f.style.top=y+'px';
+  f.addEventListener('animationend',()=>f.remove());
+  floats.appendChild(f);
+}
+function flash(color){
+  big.animate([{boxShadow:`0 0 0 0 ${color}`},{boxShadow:`0 0 0 46px transparent`}],{duration:520,easing:'cubic-bezier(.2,.8,.2,1)'});
+}
+big.addEventListener('click',e=>{
+  const D=derived(), r=floats.getBoundingClientRect();
+  let x=e.clientX-r.left, y=e.clientY-r.top;
+  if(!e.clientX&&!e.clientY){x=r.width/2;y=r.height/2;}
+  x+= (Math.random()-.5)*30;
+  let gain=D.click, cls='', bonus=0;
+  const roll=Math.random();
+  if(roll<D.dia){ bonus=Math.max(S.clicks*DIA_PCT,D.click); cls='dia'; flash('rgba(127,231,255,.55)'); }
+  else if(roll<D.dia+D.gold){ bonus=Math.max(S.clicks*GOLD_PCT,D.click); cls='gold'; flash('rgba(245,196,81,.55)'); }
+  gain+=bonus;
+  S.clicks+=gain; S.earned+=gain; S.lifetime+=gain; S.taps++;
+  floatText('+'+fmt(gain),cls,x,y);
+  if(cls) setTimeout(()=>floatText(cls==='dia'?'Diamante':'Dorado',cls,x,y+26),90);
+  $('count').textContent=fmt(Math.floor(S.clicks));
+});
+
+/* ============ BUCLE ============ */
+let prev=performance.now(), uiT=0;
+setInterval(()=>{
+  const now=performance.now(), dt=Math.min(60,(now-prev)/1000); prev=now;
+  const c=derived().cps*dt;
+  if(c){S.clicks+=c;S.earned+=c;S.lifetime+=c;}
+  uiT+=dt; if(uiT>=.1){uiT=0;render();}
+},50);
+setInterval(save,5000);
+function save(){ S.last=Date.now(); try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){} }
+addEventListener('beforeunload',save);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)save();});
+
+/* ============ UI ============ */
+let tt; function toast(t){const el=$('toast');el.textContent=t;el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),3200);}
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;tab=b.dataset.cat;
+  [...$('tabs').children].forEach(x=>x.classList.toggle('on',x===b));render();});
+$('modes').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;mode=b.dataset.m;
+  [...$('modes').children].forEach(x=>x.classList.toggle('on',x===b));render();});
+
+const dlg=$('dlg'); let onYes=null;
+function ask(title,text,yesLabel,cls,fn){
+  $('dTitle').textContent=title;$('dText').textContent=text;
+  const y=$('dYes');y.textContent=yesLabel;y.className=cls;onYes=fn;dlg.showModal();
+}
+$('dNo').onclick=()=>dlg.close();
+$('dYes').onclick=()=>{dlg.close();onYes&&onYes();};
+
+$('rebirth').onclick=()=>{
+  const n=S.world+2;
+  ask(`Renacer en el Mundo ${n}`,
+    `Perderás tus clics y mejoras actuales, pero entrarás en "${WORLD_NAMES[S.world+1]}" con beneficios x${2**(S.world+1)} en todo.`,
+    'Renacer','pri',()=>{
+      const keep={lifetime:S.lifetime,taps:S.taps,won:S.won};
+      S=Object.assign(fresh(),keep,{world:S.world+1});
+      save();render();toast(`Bienvenido al Mundo ${S.world+1}: ${WORLD_NAMES[S.world]}`);
+    });
+};
+$('menuBtn').onclick=()=>{
+  ask('Ajustes',
+    `Clics totales de por vida: ${fmt(Math.floor(S.lifetime))} · Pulsaciones: ${fmt(S.taps)}. ¿Quieres borrar la partida y empezar de cero?`,
+    'Borrar partida','dan',()=>{S=fresh();save();render();toast('Partida reiniciada');});
+};
+
+/* ============ INICIO ============ */
+buildList();
+// progreso sin conexión
+{
+  const secs=Math.min((Date.now()-S.last)/1000,OFFLINE_MAX_H*3600);
+  const g=derived().cps*secs*OFFLINE_RATE;
+  if(secs>60 && g>=1){S.clicks+=g;S.earned+=g;S.lifetime+=g;
+    setTimeout(()=>toast(`Mientras no estabas: +${fmt(g)} clics`),600);}
+}
+render();
+</script>
+</body>
+</html>
