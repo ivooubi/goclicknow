@@ -1,25 +1,42 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0b0c10">
+<meta name="theme-color" content="#0a0a0a" id="metaTheme">
 <title>Ascenso</title>
+<script>
+/* Aplica el tema antes de pintar para evitar parpadeos */
+(function(){var t;try{t=localStorage.getItem('ascenso_theme');}catch(e){}
+if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';
+document.documentElement.setAttribute('data-theme',t);})();
+</script>
 <style>
 :root{
-  --h:210;
-  --bg:#0b0c10;
-  --panel:#12141a;
-  --panel2:#171a22;
-  --line:rgba(255,255,255,.07);
-  --text:#eceef3;
-  --muted:#8b91a1;
-  --accent:hsl(var(--h) 90% 62%);
-  --accent-soft:hsl(var(--h) 90% 62% / .14);
-  --gold:#f5c451;
-  --dia:#7fe7ff;
   --radius:16px;
   --ease:cubic-bezier(.2,.8,.2,1);
+}
+:root[data-theme="dark"]{
+  --bg:#0a0a0a; --panel:#111111; --panel2:#1a1a1a;
+  --line:rgba(255,255,255,.09); --line-strong:rgba(255,255,255,.18);
+  --text:#f4f4f4; --muted:#8c8c8c;
+  --accent:#ffffff; --on-accent:#0a0a0a;
+  --btn1:#ffffff; --btn2:#bdbdbd; --core:rgba(0,0,0,.10); --core-line:rgba(0,0,0,.18);
+  --ring:rgba(255,255,255,.07); --ring2:rgba(255,255,255,.035); --glow:rgba(255,255,255,.14);
+  --ok-line:rgba(255,255,255,.38);
+  --gold:#f5c451; --dia:#7fe7ff;
+  --inset-hi:rgba(255,255,255,.7); --inset-lo:rgba(0,0,0,.18);
+}
+:root[data-theme="light"]{
+  --bg:#fafafa; --panel:#ffffff; --panel2:#f1f1f1;
+  --line:rgba(0,0,0,.09); --line-strong:rgba(0,0,0,.2);
+  --text:#0a0a0a; --muted:#6b6b6b;
+  --accent:#0a0a0a; --on-accent:#ffffff;
+  --btn1:#2e2e2e; --btn2:#000000; --core:rgba(255,255,255,.10); --core-line:rgba(255,255,255,.22);
+  --ring:rgba(0,0,0,.07); --ring2:rgba(0,0,0,.035); --glow:rgba(0,0,0,.18);
+  --ok-line:rgba(0,0,0,.4);
+  --gold:#b7791f; --dia:#0b84a5;
+  --inset-hi:rgba(255,255,255,.28); --inset-lo:rgba(0,0,0,.4);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
@@ -27,26 +44,34 @@ body{
   background:var(--bg);color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,sans-serif;
   -webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(900px 500px at 25% -10%, hsl(var(--h) 80% 50% / .10), transparent 70%);
-  transition:background-image .8s;
+  transition:background .35s, color .35s;
 }
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .top{
-  display:flex;align-items:center;justify-content:space-between;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
   padding:max(14px,env(safe-area-inset-top)) 22px 14px;
   border-bottom:1px solid var(--line);
 }
 .brand{font-weight:650;letter-spacing:.22em;font-size:13px;text-transform:uppercase}
 .world{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
 .world b{
-  background:var(--accent-soft);color:var(--accent);
+  background:var(--panel2);color:var(--text);border:1px solid var(--line);
   padding:3px 9px;border-radius:99px;font-weight:600;font-size:12px;
 }
+.dots{display:flex;gap:4px}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--line-strong);transition:background .4s}
+.dots i.on{background:var(--accent)}
+.tools{display:flex;gap:8px}
 .ghost{
   color:var(--muted);font-size:13px;padding:7px 12px;border-radius:10px;
   border:1px solid var(--line);transition:.2s var(--ease);
+  display:inline-flex;align-items:center;justify-content:center;
 }
 .ghost:hover{color:var(--text);background:var(--panel2)}
+#themeBtn{width:36px;padding:7px 0}
+#themeBtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+:root[data-theme="dark"] .i-moon{display:none}
+:root[data-theme="light"] .i-sun{display:none}
 
 main{
   display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:0;
@@ -67,40 +92,37 @@ main{
 .btnwrap{position:relative;width:min(240px,56vw);aspect-ratio:1}
 #big{
   position:relative;width:100%;height:100%;border-radius:50%;
-  background:
-    radial-gradient(circle at 35% 28%, hsl(var(--h) 90% 75% / .95), hsl(var(--h) 85% 52%) 55%, hsl(var(--h) 80% 38%));
+  background:radial-gradient(circle at 35% 28%, var(--btn1), var(--btn2));
   box-shadow:
-    0 0 0 10px hsl(var(--h) 90% 62% / .08),
-    0 0 0 22px hsl(var(--h) 90% 62% / .04),
-    0 24px 60px hsl(var(--h) 90% 50% / .28),
-    inset 0 -10px 24px rgba(0,0,0,.25),
-    inset 0 6px 14px rgba(255,255,255,.25);
-  transition:transform .18s var(--ease), box-shadow .6s, background .6s;
+    0 0 0 10px var(--ring),
+    0 0 0 22px var(--ring2),
+    0 24px 60px var(--glow),
+    inset 0 -10px 24px var(--inset-lo),
+    inset 0 6px 14px var(--inset-hi);
+  transition:transform .18s var(--ease);
   animation:breathe 4s ease-in-out infinite;
   user-select:none;touch-action:manipulation;
 }
 #big:hover{transform:scale(1.025)}
 #big:active{transform:scale(.955)}
-#big:focus-visible{outline:2px solid #fff;outline-offset:6px}
+#big:focus-visible{outline:2px solid var(--text);outline-offset:6px}
 .core{
   position:absolute;inset:36%;border-radius:50%;
-  background:rgba(255,255,255,.18);
-  box-shadow:inset 0 0 0 2px rgba(255,255,255,.35);
+  background:var(--core);box-shadow:inset 0 0 0 2px var(--core-line);
   pointer-events:none;
 }
 @keyframes breathe{50%{box-shadow:
-    0 0 0 14px hsl(var(--h) 90% 62% / .08),
-    0 0 0 30px hsl(var(--h) 90% 62% / .03),
-    0 24px 70px hsl(var(--h) 90% 50% / .34),
-    inset 0 -10px 24px rgba(0,0,0,.25),
-    inset 0 6px 14px rgba(255,255,255,.25);}}
+    0 0 0 14px var(--ring),
+    0 0 0 30px var(--ring2),
+    0 24px 70px var(--glow),
+    inset 0 -10px 24px var(--inset-lo),
+    inset 0 6px 14px var(--inset-hi);}}
 
 #floats{position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:5}
 .f{
   position:absolute;font-weight:650;font-size:20px;white-space:nowrap;
-  transform:translate(-50%,-50%);
+  transform:translate(-50%,-50%);color:var(--text);
   animation:floatUp .95s var(--ease) forwards;
-  text-shadow:0 2px 12px rgba(0,0,0,.5);
 }
 .f.gold{color:var(--gold);font-size:26px}
 .f.dia{color:var(--dia);font-size:30px}
@@ -113,40 +135,40 @@ main{
 .stats{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 .chip{
   background:var(--panel);border:1px solid var(--line);border-radius:12px;
-  padding:9px 14px;min-width:92px;text-align:center;
+  padding:9px 14px;min-width:92px;text-align:center;transition:background .35s,border-color .35s;
 }
 .chip small{display:block;color:var(--muted);font-size:11px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:3px}
 .chip b{font-size:15px;font-variant-numeric:tabular-nums}
 .chip.g b{color:var(--gold)} .chip.d b{color:var(--dia)}
 
 .progress{width:min(440px,100%)}
-.bar{height:8px;border-radius:99px;background:var(--panel2);overflow:hidden}
-.bar i{display:block;height:100%;width:0;border-radius:inherit;background:var(--accent);transition:width .25s linear, background .6s}
+.bar{height:8px;border-radius:99px;background:var(--panel2);overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;width:0;border-radius:inherit;background:var(--accent);transition:width .25s linear}
 .plabel{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:13px;color:var(--muted);gap:10px;min-height:34px}
 #rebirth{
-  background:var(--accent);color:#06101a;font-weight:650;font-size:13px;
+  background:var(--accent);color:var(--on-accent);font-weight:650;font-size:13px;
   padding:8px 14px;border-radius:10px;
   animation:pulse 1.8s ease-in-out infinite;
 }
 #rebirth[hidden]{display:none}
-@keyframes pulse{50%{box-shadow:0 0 0 8px hsl(var(--h) 90% 62% / .18)}}
+@keyframes pulse{50%{box-shadow:0 0 0 8px var(--ring)}}
 
 /* tienda */
 .shop{
   background:var(--panel);border-left:1px solid var(--line);
-  display:flex;flex-direction:column;min-height:0;
+  display:flex;flex-direction:column;min-height:0;transition:background .35s;
 }
 .shophead{padding:14px 14px 10px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
-.tabs,.modes{display:flex;gap:4px;background:var(--bg);padding:4px;border-radius:11px}
+.tabs,.modes{display:flex;gap:4px;background:var(--bg);padding:4px;border-radius:11px;border:1px solid var(--line)}
 .tabs button,.modes button{
   flex:1;padding:7px 4px;font-size:12.5px;color:var(--muted);border-radius:8px;transition:.2s var(--ease);
 }
-.tabs button.on,.modes button.on{background:var(--panel2);color:var(--text)}
+.tabs button.on,.modes button.on{background:var(--accent);color:var(--on-accent);font-weight:600}
 #list{overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;flex:1;min-height:0}
 .up{
   display:grid;grid-template-columns:1fr auto;gap:2px 12px;text-align:left;
   padding:12px 14px;border-radius:14px;background:var(--panel2);
-  border:1px solid transparent;transition:transform .15s var(--ease), border-color .2s, opacity .2s;
+  border:1px solid transparent;transition:transform .15s var(--ease), border-color .2s, opacity .2s, background .35s;
   animation:in .35s var(--ease);
 }
 @keyframes in{from{opacity:0;transform:translateY(6px)}}
@@ -154,12 +176,12 @@ main{
 .up .lv{font-size:12px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
 .up .d{font-size:12.5px;color:var(--muted)}
 .up .c{font-size:13px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
-.up.ok{border-color:hsl(var(--h) 90% 62% / .35)}
-.up.ok .c{color:var(--accent)}
+.up.ok{border-color:var(--ok-line)}
+.up.ok .c{color:var(--text)}
 .up.ok:hover{transform:translateY(-1px)}
 .up.ok:active{transform:scale(.985)}
-.up:not(.ok){opacity:.55;cursor:default}
-.up.maxed{opacity:.5;cursor:default}
+.up:not(.ok){opacity:.5;cursor:default}
+.up.maxed{opacity:.45;cursor:default}
 .up.gold .n{color:var(--gold)} .up.dia .n{color:var(--dia)}
 .up.bump{animation:bump .3s var(--ease)}
 @keyframes bump{40%{transform:scale(.97)}}
@@ -167,7 +189,7 @@ main{
 
 #toast{
   position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);
-  background:var(--panel2);border:1px solid var(--line);padding:11px 18px;border-radius:12px;
+  background:var(--accent);color:var(--on-accent);padding:11px 18px;border-radius:12px;
   font-size:13.5px;opacity:0;pointer-events:none;transition:.35s var(--ease);z-index:50;max-width:90vw;text-align:center;
 }
 #toast.show{opacity:1;transform:translate(-50%,0)}
@@ -176,14 +198,69 @@ dialog{
   margin:auto;background:var(--panel);color:var(--text);border:1px solid var(--line);
   border-radius:20px;padding:26px;width:min(380px,90vw);
 }
-dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
+dialog::backdrop{background:rgba(0,0,0,.55);backdrop-filter:blur(4px)}
 dialog[open]{animation:in .3s var(--ease)}
 dialog h2{font-size:18px;margin-bottom:8px}
 dialog p{color:var(--muted);font-size:14px;line-height:1.5;margin-bottom:20px}
 dialog .row{display:flex;gap:10px;justify-content:flex-end}
 dialog .row button{padding:9px 16px;border-radius:10px;font-size:14px;border:1px solid var(--line)}
-dialog .row .pri{background:var(--accent);color:#06101a;font-weight:650;border-color:transparent}
+dialog .row .pri{background:var(--accent);color:var(--on-accent);font-weight:650;border-color:transparent}
 dialog .row .dan{background:#e5484d;color:#fff;font-weight:650;border-color:transparent}
+.menu{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.menu button{padding:11px 14px;border-radius:12px;font-size:14px;text-align:left;border:1px solid var(--line);background:var(--panel2);transition:.2s var(--ease)}
+.menu button:hover{border-color:var(--line-strong)}
+.menu button.dan{color:#e5484d}
+.menu small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+
+[hidden]{display:none!important}
+:root[data-theme="dark"]{--up:#4ade80;--down:#ff6b6b}
+:root[data-theme="light"]{--up:#15803d;--down:#c62828}
+.stage{position:relative}
+
+/* eventos */
+#evt{
+  position:absolute;top:16px;left:50%;transform:translateX(-50%);
+  width:min(420px,calc(100% - 32px));
+  border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:9px 14px;font-size:13px;
+  display:flex;flex-direction:column;gap:6px;transition:border-color .3s,background .35s;
+}
+#evt .row1{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+#evt b{font-weight:650}
+#evt .t{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+#evt .d{color:var(--muted);font-size:12px}
+#evt .eb{height:3px;border-radius:9px;background:var(--panel2);overflow:hidden}
+#evt .eb i{display:block;height:100%;width:0;background:var(--accent)}
+#evt.live{border-color:var(--ok-line);animation:in .4s var(--ease)}
+#evt:not(.live) .eb,#evt:not(.live) .d{display:none}
+#evt:not(.live) b{color:var(--muted);font-weight:500}
+@media (max-width:860px){#evt{position:static;transform:none;width:100%;max-width:420px}}
+
+/* mercado */
+#market{overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:14px;flex:1;min-height:0}
+.col{display:flex;flex-direction:column;gap:14px}
+.mk-top{display:flex;justify-content:space-between;align-items:flex-end}
+.mk-top small{color:var(--muted);font-size:11px;letter-spacing:.04em;text-transform:uppercase;display:block;margin-bottom:2px}
+#mkPrice{font-size:34px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
+#mkChg{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+#mkChg.up{color:var(--up)} #mkChg.down{color:var(--down)}
+.tag{font-size:12px;padding:3px 9px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.tag.cheap{color:var(--up);border-color:currentColor}
+.tag.dear{color:var(--down);border-color:currentColor}
+#mkChart{width:100%;height:140px;display:block;border:1px solid var(--line);border-radius:14px;background:var(--panel2)}
+.mk-hold{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mk-hold>div{background:var(--panel2);border-radius:12px;padding:10px 12px;min-width:0}
+.mk-hold small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.mk-hold b{font-size:14px;font-variant-numeric:tabular-nums;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mk-hold b.up{color:var(--up)} .mk-hold b.down{color:var(--down)}
+.mk-act{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mk-act h4{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.mk-act .bt{display:flex;gap:6px}
+.mk-act button{flex:1;padding:9px 0;font-size:13px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);transition:.2s var(--ease)}
+.mk-act button:hover:not(:disabled){border-color:var(--ok-line)}
+.mk-act button:active:not(:disabled){transform:scale(.96)}
+.mk-act button:disabled{opacity:.4;cursor:default}
+.mk-note{color:var(--muted);font-size:12px;line-height:1.5}
+#mkLock{color:var(--muted);font-size:13px;text-align:center;padding:30px 10px;line-height:1.6}
 
 @media (max-width:860px){
   html,body{height:auto}
@@ -191,6 +268,7 @@ dialog .row .dan{background:#e5484d;color:#fff;font-weight:650;border-color:tran
   .stage{padding:28px 16px}
   .shop{border-left:0;border-top:1px solid var(--line)}
   #list{max-height:none;overflow:visible}
+  .dots{display:none}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
@@ -200,12 +278,23 @@ dialog .row .dan{background:#e5484d;color:#fff;font-weight:650;border-color:tran
 <body>
 <header class="top">
   <div class="brand">Ascenso</div>
-  <div class="world"><span id="worldName"></span><b id="worldMult"></b></div>
-  <button class="ghost" id="menuBtn">Ajustes</button>
+  <div class="world"><span id="worldName"></span><b id="worldMult"></b><span class="dots" id="dots"></span></div>
+  <div class="tools">
+    <button class="ghost" id="themeBtn" aria-label="Cambiar tema">
+      <svg class="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+    <button class="ghost" id="menuBtn">Ajustes</button>
+  </div>
 </header>
 
 <main>
   <section class="stage">
+    <div id="evt">
+      <div class="row1"><b id="evName">Próximo evento</b><span class="t" id="evTime"></span></div>
+      <div class="d" id="evDesc"></div>
+      <div class="eb"><i id="evBar"></i></div>
+    </div>
     <div class="count">
       <div id="count">0</div>
       <div class="sub"><span id="cps">0</span> clics por segundo</div>
@@ -236,6 +325,7 @@ dialog .row .dan{background:#e5484d;color:#fff;font-weight:650;border-color:tran
         <button data-cat="cps">Automático</button>
         <button data-cat="luck">Suerte</button>
         <button data-cat="mult">Global</button>
+        <button data-cat="market">Mercado</button>
       </div>
       <div class="modes" id="modes">
         <button data-m="1" class="on">x1</button>
@@ -244,26 +334,97 @@ dialog .row .dan{background:#e5484d;color:#fff;font-weight:650;border-color:tran
       </div>
     </div>
     <div id="list"></div>
+    <div id="market" hidden>
+      <div id="mkLock" hidden></div>
+      <div id="mkBody" class="col">
+        <div class="mk-top">
+          <div><small>Cristal · precio</small><div id="mkPrice">100.0</div></div>
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end"><span id="mkChg">—</span><span class="tag" id="mkTag">Normal</span></div>
+        </div>
+        <canvas id="mkChart"></canvas>
+        <div class="mk-hold">
+          <div><small>Unidades</small><b id="mkUnits">0</b></div>
+          <div><small>Valor</small><b id="mkValue">0</b></div>
+          <div><small>Resultado</small><b id="mkPL">0</b></div>
+        </div>
+        <div class="mk-act">
+          <div><h4>Comprar</h4><div class="bt">
+            <button data-k="buy" data-f="0.25">25%</button><button data-k="buy" data-f="0.5">50%</button><button data-k="buy" data-f="1">Todo</button>
+          </div></div>
+          <div><h4>Vender</h4><div class="bt">
+            <button data-k="sell" data-f="0.25">25%</button><button data-k="sell" data-f="0.5">50%</button><button data-k="sell" data-f="1">Todo</button>
+          </div></div>
+        </div>
+        <p class="mk-note">Compra cuando el precio esté bajo y vende cuando suba. El precio oscila en ciclos y los eventos pueden dispararlo o hundirlo. Comisión del 1% por operación. Las unidades se reinician al renacer.</p>
+      </div>
+    </div>
   </aside>
 </main>
 
 <div id="toast"></div>
+
 <dialog id="dlg">
   <h2 id="dTitle"></h2>
   <p id="dText"></p>
   <div class="row"><button id="dNo">Cancelar</button><button id="dYes" class="pri">Aceptar</button></div>
 </dialog>
 
+<dialog id="sdlg">
+  <h2>Ajustes</h2>
+  <p id="sStats"></p>
+  <div class="menu">
+    <button id="bExport">Exportar partida<small>Copia un código para guardar tu progreso o llevarlo a otro dispositivo.</small></button>
+    <button id="bImport">Importar partida<small>Pega un código exportado para recuperar tu progreso.</small></button>
+    <button id="bWipe" class="dan">Borrar partida<small>Empieza de cero. No se puede deshacer.</small></button>
+  </div>
+  <div class="row"><button id="sClose">Cerrar</button></div>
+</dialog>
+
 <script>
-/* ============ CONFIGURACIÓN (todo el equilibrio del juego está aquí) ============ */
+/* =====================================================================
+   REGLAS PARA ACTUALIZAR EL JUEGO SIN PERDER EL PROGRESO DE LOS JUGADORES
+   1. NO cambies SAVE_KEY nunca.
+   2. NO cambies el "id" de una mejora ya publicada (se guarda por id).
+      Puedes cambiar nombre, coste, valor y descripción libremente.
+   3. Para añadir datos nuevos al guardado: añádelos a fresh() y, si hace
+      falta transformarlos, a sanitize(). Los guardados viejos se completan
+      solos con los valores por defecto.
+   4. Sube SAVE_VERSION solo si necesitas migrar datos viejos en migrate().
+   ===================================================================== */
 const SAVE_KEY = 'ascenso_save_v1';
+const BACKUP_KEY = 'ascenso_save_v1_backup';
+const THEME_KEY = 'ascenso_theme';
+const SAVE_VERSION = 3;
+
+/* ============ CONFIGURACIÓN DEL JUEGO ============ */
 const WORLD_NAMES = ['Origen','Éter','Aurora','Nébula','Cosmos','Infinito'];
-const WORLD_HUES  = [210, 265, 160, 330, 35, 190];
 // Clics acumulados en el mundo necesarios para poder renacer (el último es la meta final)
 const GOALS = [2.5e5, 5e6, 1e8, 2e9, 5e10, 1e12];
 const GOLD_PCT = 0.05, DIA_PCT = 0.15;
 const GOLD_CAP = 0.5, DIA_CAP = 0.25;
 const OFFLINE_RATE = 0.5, OFFLINE_MAX_H = 8;
+
+/* ---- Eventos aleatorios ----
+   Se lanza uno cada EVENT_MIN_S..EVENT_MAX_S segundos. w = peso (probabilidad relativa).
+   Efectos: click (x clics), cps (x clics/s), gold/dia (+prob. de golpe), mkt (empuja el precio del mercado). */
+const EVENT_MIN_S = 75, EVENT_MAX_S = 150;
+const EVENTS = [
+  {id:'frenesi',  name:'Frenesí',            desc:'Tus clics valen x2',                          dur:25, click:2,  w:3},
+  {id:'turbo',    name:'Turbo',              desc:'Clics por segundo x3',                        dur:20, cps:3,    w:3},
+  {id:'oro',      name:'Lluvia de oro',      desc:'+20% de probabilidad de golpe dorado',        dur:20, gold:.2,   w:2},
+  {id:'diamante', name:'Fiebre de diamante', desc:'+10% de probabilidad de golpe de diamante',   dur:20, dia:.1,    w:2},
+  {id:'burbuja',  name:'Burbuja bursátil',   desc:'El Cristal se dispara: es buen momento para vender', dur:30, mkt:1.8, w:2, market:true},
+  {id:'crack',    name:'Crack bursátil',     desc:'El Cristal se hunde: es buen momento para comprar',  dur:30, mkt:.5,  w:2, market:true},
+];
+
+/* ---- Mercado del Cristal ---- */
+const MK_BASE=100;        // precio medio
+const MK_STEP=1.5;        // segundos entre cambios de precio
+const MK_HIST=160;        // puntos de historial guardados
+const MK_FEE=0.01;        // comisión por operación
+const MK_UNLOCK=3000;     // clics totales para desbloquearlo
+const MK_CYCLE=300;       // duración (s) del ciclo lento de subida/bajada
+const MK_AMP=.35, MK_SIGMA=.03, MK_K=.08, MK_MIN=25, MK_MAX=400;
 
 /* cat: click | cps | luck | mult · g = crecimiento del coste por nivel · max = niveles máximos */
 const U = [];
@@ -299,10 +460,67 @@ function fmt(n){
 const $=id=>document.getElementById(id);
 const pct=x=>(x*100).toFixed(x*100%1?1:0)+'%';
 
-/* ============ ESTADO ============ */
-const fresh=()=>({world:0,clicks:0,earned:0,lifetime:0,taps:0,levels:{},won:false,last:Date.now()});
+/* ============ GUARDADO ROBUSTO ============ */
+const freshMarket=()=>({price:MK_BASE,hist:[MK_BASE],units:0,cost:0,profit:0,acc:0});
+const rndWait=()=>Date.now()+(EVENT_MIN_S+Math.random()*(EVENT_MAX_S-EVENT_MIN_S))*1000;
+const fresh=()=>({v:SAVE_VERSION,world:0,clicks:0,earned:0,lifetime:0,taps:0,levels:{},won:false,last:Date.now(),
+  event:null,nextEvent:rndWait(),market:freshMarket()});
+
+// Pasos de migración para guardados de versiones anteriores (añade aquí cuando subas SAVE_VERSION)
+function migrate(raw){
+  // v1 -> v2: sin cambios de estructura, solo se añade el campo "v".
+  // v2 -> v3: nuevos campos (event, nextEvent, market); sanitize() los rellena con valores por defecto.
+  return raw;
+}
+
+// Limpia y completa cualquier guardado: campos que faltan, valores raros, niveles fuera de rango.
+function sanitize(raw){
+  const d=Object.assign(fresh(),(raw&&typeof raw==='object')?raw:{});
+  const num=(x,def=0)=>(typeof x==='number'&&Number.isFinite(x)&&x>=0)?x:def;
+  d.world=Math.min(GOALS.length-1,Math.floor(num(d.world)));
+  d.clicks=num(d.clicks); d.earned=num(d.earned); d.lifetime=num(d.lifetime); d.taps=num(d.taps);
+  d.won=!!d.won; d.last=num(d.last,Date.now());
+  const lv={};
+  if(d.levels&&typeof d.levels==='object')
+    for(const k in d.levels) lv[k]=Math.floor(num(d.levels[k]));   // se conservan incluso ids que ya no existan
+  for(const u of U) if(lv[u.id]>u.max) lv[u.id]=u.max;
+  d.levels=lv; d.v=SAVE_VERSION;
+  // eventos
+  d.nextEvent=num(d.nextEvent,rndWait());
+  d.event=(d.event&&typeof d.event==='object'&&EVENTS.some(e=>e.id===d.event.id)&&Number.isFinite(d.event.until))
+    ?{id:d.event.id,until:d.event.until}:null;
+  // mercado
+  const mk=Object.assign(freshMarket(),(d.market&&typeof d.market==='object')?d.market:{});
+  mk.price=Math.min(MK_MAX,Math.max(MK_MIN,num(mk.price,MK_BASE)));
+  mk.units=num(mk.units); mk.cost=num(mk.cost); mk.acc=num(mk.acc);
+  mk.profit=Number.isFinite(mk.profit)?mk.profit:0;
+  mk.hist=(Array.isArray(mk.hist)?mk.hist:[]).filter(x=>typeof x==='number'&&Number.isFinite(x)).slice(-MK_HIST);
+  if(!mk.hist.length) mk.hist=[mk.price];
+  d.market=mk;
+  return d;
+}
+
+function parseSave(str){
+  if(!str) return null;
+  try{ return sanitize(migrate(JSON.parse(str))); }catch(e){ return null; }
+}
+
 let S=fresh();
-try{ const raw=localStorage.getItem(SAVE_KEY); if(raw) S=Object.assign(fresh(),JSON.parse(raw)); }catch(e){}
+(function load(){
+  let main=null,bak=null;
+  try{ main=localStorage.getItem(SAVE_KEY); bak=localStorage.getItem(BACKUP_KEY); }catch(e){}
+  const parsed=parseSave(main)||parseSave(bak);   // si el principal está corrupto, usa la copia de seguridad
+  if(parsed) S=parsed;
+  // Copia de seguridad del guardado tal como estaba antes de esta sesión/actualización
+  try{ if(main && parseSave(main)) localStorage.setItem(BACKUP_KEY,main); }catch(e){}
+})();
+
+function save(){
+  if(![S.clicks,S.earned,S.lifetime].every(Number.isFinite)) return;   // nunca guardar datos rotos
+  S.last=Date.now();
+  try{ localStorage.setItem(SAVE_KEY,JSON.stringify(S)); }catch(e){}
+}
+
 let tab='click', mode='1';
 
 function derived(){
@@ -316,7 +534,18 @@ function derived(){
     else if(u.type==='mult') mult+=u.v*l;
   }
   const m=(2**S.world)*(1+mult);
-  return {click:click*m,cps:cps*m,gold:Math.min(gold,GOLD_CAP),dia:Math.min(dia,DIA_CAP),m};
+  const ev=activeEvent();
+  return {
+    click:click*m*((ev&&ev.click)||1),
+    cps:cps*m*((ev&&ev.cps)||1),
+    gold:Math.min(gold+((ev&&ev.gold)||0),GOLD_CAP),
+    dia:Math.min(dia+((ev&&ev.dia)||0),DIA_CAP),
+    m
+  };
+}
+function activeEvent(){
+  if(!S.event||Date.now()>=S.event.until) return null;
+  return EVENTS.find(e=>e.id===S.event.id)||null;
 }
 const goal=()=>GOALS[S.world];
 
@@ -355,10 +584,13 @@ function buy(u,el){
   if(!p.n||S.clicks<p.cost) return;
   S.clicks-=p.cost; S.levels[u.id]=lvl+p.n;
   el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
-  render();
+  render(); save();
 }
 
 /* ============ RENDER ============ */
+const dotsEl=$('dots');
+for(let i=0;i<GOALS.length;i++) dotsEl.appendChild(document.createElement('i'));
+
 function render(){
   const D=derived(), g=goal();
   $('count').textContent=fmt(Math.floor(S.clicks));
@@ -369,7 +601,9 @@ function render(){
   $('sMult').textContent='x'+(Math.round(D.m*100)/100);
   $('worldName').textContent=`Mundo ${S.world+1} · ${WORLD_NAMES[S.world]}`;
   $('worldMult').textContent='x'+2**S.world;
-  document.documentElement.style.setProperty('--h',WORLD_HUES[S.world]);
+  [...dotsEl.children].forEach((d,i)=>d.classList.toggle('on',i<=S.world));
+  renderEvent();
+  if(tab==='market') renderMarket();
 
   const ratio=Math.min(1,S.earned/g);
   $('barFill').style.width=(ratio*100)+'%';
@@ -394,11 +628,10 @@ function render(){
     el.classList.toggle('maxed',maxed);
     el.classList.toggle('ok',!maxed && S.clicks>=p.cost);
   }
-  // pestañas vacías
   const empty=!U.some(u=>u.cat===tab&&((S.levels[u.id]||0)>0||S.earned>=u.base*.5));
   let hint=$('hint');
   if(empty){
-    if(!hint){hint=document.createElement('div');hint.id='hint';hint.className='d';
+    if(!hint){hint=document.createElement('div');hint.id='hint';
       hint.style.cssText='color:var(--muted);font-size:13px;text-align:center;padding:24px 10px';
       hint.textContent='Sigue jugando para desbloquear mejoras aquí.';$('list').appendChild(hint);}
   } else if(hint) hint.remove();
@@ -433,26 +666,176 @@ big.addEventListener('click',e=>{
   $('count').textContent=fmt(Math.floor(S.clicks));
 });
 
+/* ============ EVENTOS ============ */
+const evEl={box:$('evt'),name:$('evName'),time:$('evTime'),desc:$('evDesc'),bar:$('evBar')};
+const mkUnlocked=()=>S.lifetime>=MK_UNLOCK;
+const mmss=s=>{s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
+
+function pickEvent(){
+  const pool=EVENTS.filter(e=>!e.market||mkUnlocked());
+  let r=Math.random()*pool.reduce((a,e)=>a+e.w,0);
+  for(const e of pool){ r-=e.w; if(r<=0) return e; }
+  return pool[0];
+}
+function eventTick(){
+  const now=Date.now();
+  if(S.event && now>=S.event.until){ S.event=null; S.nextEvent=rndWait(); save(); }
+  if(!S.event && S.nextEvent-now>(EVENT_MAX_S+5)*1000) S.nextEvent=rndWait();   // por si el reloj cambió
+  if(!S.event && now>=S.nextEvent){
+    const e=pickEvent(); S.event={id:e.id,until:now+e.dur*1000};
+    toast(`Evento: ${e.name} · ${e.desc}`); save();
+  }
+}
+function renderEvent(){
+  const now=Date.now(), ev=activeEvent();
+  if(ev){
+    const left=(S.event.until-now)/1000;
+    evEl.box.classList.add('live');
+    evEl.name.textContent=ev.name; evEl.desc.textContent=ev.desc;
+    evEl.time.textContent=mmss(left);
+    evEl.bar.style.width=Math.max(0,left/ev.dur*100)+'%';
+  } else {
+    evEl.box.classList.remove('live');
+    evEl.name.textContent='Próximo evento';
+    evEl.time.textContent=mmss((S.nextEvent-now)/1000);
+  }
+}
+
+/* ============ MERCADO ============ */
+const mkCanvas=$('mkChart');
+function randn(){ let u=0,v=0; while(!u)u=Math.random(); while(!v)v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+
+// El precio sigue un ciclo lento (predecible) + ruido aleatorio + el empujón de los eventos bursátiles.
+function mkStep(){
+  const m=S.market, ev=activeEvent();
+  const cyc=Math.sin(2*Math.PI*(Date.now()/1000)/MK_CYCLE);
+  const target=MK_BASE*Math.exp(MK_AMP*cyc)*((ev&&ev.mkt)||1);
+  let lp=Math.log(m.price);
+  lp+=MK_K*(Math.log(target)-lp)+MK_SIGMA*randn();
+  m.price=Math.min(MK_MAX,Math.max(MK_MIN,Math.exp(lp)));
+  m.hist.push(m.price); if(m.hist.length>MK_HIST) m.hist.shift();
+}
+function marketTick(dt){
+  const m=S.market; m.acc+=dt; let moved=false;
+  while(m.acc>=MK_STEP){ m.acc-=MK_STEP; mkStep(); moved=true; }
+  if(moved) drawChart();
+}
+
+function trade(kind,frac){
+  const m=S.market; if(!mkUnlocked()) return;
+  if(kind==='buy'){
+    const spend=S.clicks*frac; if(spend<1) return;
+    S.clicks-=spend;
+    m.units+=spend*(1-MK_FEE)/m.price; m.cost+=spend;
+  } else {
+    if(m.units<=0) return;
+    const u=frac===1?m.units:m.units*frac;
+    const revenue=u*m.price*(1-MK_FEE);
+    const costPart=frac===1?m.cost:m.cost*frac;
+    m.units-=u; m.cost-=costPart;
+    if(frac===1||m.units<1e-9){m.units=0;m.cost=0;}
+    S.clicks+=revenue;
+    const gain=revenue-costPart; m.profit+=gain;
+    if(gain>0){S.earned+=gain;S.lifetime+=gain;}   // solo el beneficio cuenta para la meta del mundo
+    toast(gain>=0?`Venta cerrada: +${fmt(gain)} de beneficio`:`Venta cerrada: −${fmt(-gain)} de pérdida`);
+  }
+  save(); render();
+}
+$('market').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-k]'); if(!b||b.disabled) return;
+  trade(b.dataset.k,+b.dataset.f);
+});
+
+function renderMarket(){
+  const unlocked=mkUnlocked();
+  $('mkLock').hidden=unlocked; $('mkBody').hidden=!unlocked;
+  if(!unlocked){
+    $('mkLock').textContent=`El mercado se abre al acumular ${fmt(MK_UNLOCK)} clics en total. Te faltan ${fmt(Math.ceil(MK_UNLOCK-S.lifetime))}.`;
+    return;
+  }
+  const m=S.market, h=m.hist, r=m.price/MK_BASE;
+  $('mkPrice').textContent=m.price.toFixed(1);
+  const ref=h[Math.max(0,h.length-1-40)], chg=(m.price/ref-1)*100;
+  const ce=$('mkChg'); ce.textContent=(chg>=0?'▲ ':'▼ ')+Math.abs(chg).toFixed(1)+'% (1 min)'; ce.className=chg>=0?'up':'down';
+  const tag=$('mkTag');
+  tag.textContent=r<.85?'Barato':r>1.15?'Caro':'Normal';
+  tag.className='tag'+(r<.85?' cheap':r>1.15?' dear':'');
+  const val=m.units*m.price*(1-MK_FEE), pl=val-m.cost;
+  $('mkUnits').textContent=fmt(m.units);
+  $('mkValue').textContent=fmt(val);
+  const pe=$('mkPL');
+  pe.textContent=m.cost>0?`${pl>=0?'+':'−'}${fmt(Math.abs(pl))} (${(pl>=0?'+':'')}${((val/m.cost-1)*100).toFixed(1)}%)`:'—';
+  pe.className=m.cost>0?(pl>=0?'up':'down'):'';
+  document.querySelectorAll('#market button[data-k]').forEach(b=>{
+    b.disabled=b.dataset.k==='buy'?S.clicks<1:m.units<=0;
+  });
+}
+
+function drawChart(){
+  if(tab!=='market'||!mkUnlocked()) return;
+  const c=mkCanvas, w=c.clientWidth, hgt=c.clientHeight; if(!w||!hgt) return;
+  const dpr=window.devicePixelRatio||1;
+  if(c.width!==Math.round(w*dpr)||c.height!==Math.round(hgt*dpr)){c.width=Math.round(w*dpr);c.height=Math.round(hgt*dpr);}
+  const g=c.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,hgt);
+  const cs=getComputedStyle(document.documentElement);
+  const text=cs.getPropertyValue('--text').trim(), lineC=cs.getPropertyValue('--line-strong').trim();
+  const h=S.market.hist, pad=14;
+  const lo=Math.min(MK_BASE,...h)*.95, hi=Math.max(MK_BASE,...h)*1.05;
+  const stepX=(w-24)/(MK_HIST-1);
+  const X=i=>w-12-(h.length-1-i)*stepX;
+  const Y=v=>pad+(1-(v-lo)/(hi-lo))*(hgt-2*pad);
+  // línea del precio medio
+  g.setLineDash([4,4]); g.strokeStyle=lineC; g.lineWidth=1; g.beginPath(); g.moveTo(0,Y(MK_BASE)); g.lineTo(w,Y(MK_BASE)); g.stroke(); g.setLineDash([]);
+  // área
+  g.beginPath(); h.forEach((v,i)=>i?g.lineTo(X(i),Y(v)):g.moveTo(X(i),Y(v)));
+  g.lineTo(X(h.length-1),hgt); g.lineTo(X(0),hgt); g.closePath();
+  g.globalAlpha=.07; g.fillStyle=text; g.fill(); g.globalAlpha=1;
+  // línea
+  g.beginPath(); h.forEach((v,i)=>i?g.lineTo(X(i),Y(v)):g.moveTo(X(i),Y(v)));
+  g.strokeStyle=text; g.lineWidth=2; g.lineJoin='round'; g.stroke();
+  // punto actual
+  g.beginPath(); g.arc(X(h.length-1),Y(h[h.length-1]),3.5,0,Math.PI*2); g.fillStyle=text; g.fill();
+}
+addEventListener('resize',drawChart);
+
 /* ============ BUCLE ============ */
 let prev=performance.now(), uiT=0;
 setInterval(()=>{
   const now=performance.now(), dt=Math.min(60,(now-prev)/1000); prev=now;
+  eventTick(); marketTick(dt);
   const c=derived().cps*dt;
   if(c){S.clicks+=c;S.earned+=c;S.lifetime+=c;}
   uiT+=dt; if(uiT>=.1){uiT=0;render();}
 },50);
 setInterval(save,5000);
-function save(){ S.last=Date.now(); try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){} }
 addEventListener('beforeunload',save);
+addEventListener('pagehide',save);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)save();});
 
 /* ============ UI ============ */
 let tt; function toast(t){const el=$('toast');el.textContent=t;el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),3200);}
 $('tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;tab=b.dataset.cat;
-  [...$('tabs').children].forEach(x=>x.classList.toggle('on',x===b));render();});
+  [...$('tabs').children].forEach(x=>x.classList.toggle('on',x===b));applyTab();});
+function applyTab(){
+  const mkt=tab==='market';
+  $('market').hidden=!mkt; $('list').hidden=mkt; $('modes').hidden=mkt;
+  render();
+  if(mkt) drawChart();
+}
 $('modes').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;mode=b.dataset.m;
   [...$('modes').children].forEach(x=>x.classList.toggle('on',x===b));render();});
 
+/* Tema claro / oscuro */
+function setTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  $('metaTheme').setAttribute('content',t==='light'?'#fafafa':'#0a0a0a');
+  try{localStorage.setItem(THEME_KEY,t);}catch(e){}
+  drawChart();
+}
+$('themeBtn').onclick=()=>setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+setTheme(document.documentElement.getAttribute('data-theme'));
+
+/* Diálogos */
 const dlg=$('dlg'); let onYes=null;
 function ask(title,text,yesLabel,cls,fn){
   $('dTitle').textContent=title;$('dText').textContent=text;
@@ -464,17 +847,43 @@ $('dYes').onclick=()=>{dlg.close();onYes&&onYes();};
 $('rebirth').onclick=()=>{
   const n=S.world+2;
   ask(`Renacer en el Mundo ${n}`,
-    `Perderás tus clics y mejoras actuales, pero entrarás en "${WORLD_NAMES[S.world+1]}" con beneficios x${2**(S.world+1)} en todo.`,
+    `Perderás tus clics y mejoras actuales, pero entrarás en "${WORLD_NAMES[S.world+1]}" con beneficios x${2**(S.world+1)} en todo. Las unidades que tengas en el mercado también se reinician.`,
     'Renacer','pri',()=>{
-      const keep={lifetime:S.lifetime,taps:S.taps,won:S.won};
-      S=Object.assign(fresh(),keep,{world:S.world+1});
+      const keep={lifetime:S.lifetime,taps:S.taps,won:S.won,event:S.event,nextEvent:S.nextEvent,
+        market:Object.assign({},S.market,{units:0,cost:0})};
+      S=sanitize(Object.assign(fresh(),keep,{world:S.world+1}));
       save();render();toast(`Bienvenido al Mundo ${S.world+1}: ${WORLD_NAMES[S.world]}`);
     });
 };
+
+/* Ajustes: exportar, importar, borrar */
+const sdlg=$('sdlg');
 $('menuBtn').onclick=()=>{
-  ask('Ajustes',
-    `Clics totales de por vida: ${fmt(Math.floor(S.lifetime))} · Pulsaciones: ${fmt(S.taps)}. ¿Quieres borrar la partida y empezar de cero?`,
-    'Borrar partida','dan',()=>{S=fresh();save();render();toast('Partida reiniciada');});
+  $('sStats').textContent=`Clics de por vida: ${fmt(Math.floor(S.lifetime))} · Pulsaciones: ${fmt(S.taps)}. Tu progreso se guarda automáticamente en este navegador y se conserva al actualizar la página.`;
+  sdlg.showModal();
+};
+$('sClose').onclick=()=>sdlg.close();
+$('bExport').onclick=async()=>{
+  save();
+  const code=btoa(JSON.stringify(S));
+  try{ await navigator.clipboard.writeText(code); toast('Código copiado al portapapeles'); }
+  catch(e){ prompt('Copia este código:',code); }
+};
+$('bImport').onclick=()=>{
+  const code=prompt('Pega aquí tu código de partida:');
+  if(!code) return;
+  let d=null;
+  try{ d=sanitize(migrate(JSON.parse(atob(code.trim())))); }catch(e){}
+  if(!d){ toast('Código no válido'); return; }
+  sdlg.close();
+  ask('Importar partida','Esto reemplazará tu progreso actual por el del código.','Importar','pri',()=>{
+    S=d; S.last=Date.now(); save(); render(); toast('Partida importada');
+  });
+};
+$('bWipe').onclick=()=>{
+  sdlg.close();
+  ask('Borrar partida','Se perderá todo tu progreso. Esta acción no se puede deshacer.','Borrar partida','dan',
+    ()=>{S=fresh();save();render();toast('Partida reiniciada');});
 };
 
 /* ============ INICIO ============ */
@@ -483,10 +892,12 @@ buildList();
 {
   const secs=Math.min((Date.now()-S.last)/1000,OFFLINE_MAX_H*3600);
   const g=derived().cps*secs*OFFLINE_RATE;
+  for(let i=0,n=Math.min(Math.floor(secs/MK_STEP),MK_HIST);i<n;i++) mkStep();   // el mercado sigue moviéndose sin ti
   if(secs>60 && g>=1){S.clicks+=g;S.earned+=g;S.lifetime+=g;
     setTimeout(()=>toast(`Mientras no estabas: +${fmt(g)} clics`),600);}
 }
 render();
+save();
 </script>
 </body>
 </html>
